@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoMoney Wallet System — Online Merchant Integration Guide v1.0.4</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
+    </script>
+    <style>
+        :root {
+            --bg: #fafbfc;
+            --surface: #ffffff;
+            --border: #e8ecf0;
+            --border-light: #f0f2f5;
+            --text: #1a1d23;
+            --text-secondary: #5a5f6b;
+            --text-tertiary: #8b909b;
+            --accent: #1a6ff5;
+            --accent-light: #e8f1fe;
+            --accent-dark: #1456c4;
+            --success: #16a34a;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --warning-light: #fffbeb;
+            --error: #dc2626;
+            --error-light: #fef2f2;
+            --info: #6366f1;
+            --info-light: #eef2ff;
+            --sidebar-width: 280px;
+            --header-height: 56px;
+            --radius-sm: 6px;
+            --radius: 10px;
+            --radius-lg: 14px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.03);
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.04), 0 2px 4px rgba(0, 0, 0, 0.02);
+            --transition: 180ms ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            scroll-padding-top: 80px;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+        .sidebar-header {
+            padding: 20px 22px 14px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+        .sidebar-header .logo {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--text);
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+        .sidebar-header .logo .dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: var(--accent);
+            flex-shrink: 0;
+        }
+        .sidebar-header .version {
+            font-size: 0.72rem;
+            color: var(--text-tertiary);
+            margin-top: 3px;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px 14px 24px;
+            scrollbar-width: thin;
+            scrollbar-color: #d1d5db transparent;
+        }
+        .sidebar-nav::-webkit-scrollbar { width: 4px; }
+        .sidebar-nav::-webkit-scrollbar-track { background: transparent; }
+        .sidebar-nav::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 10px; }
+        .sidebar-nav .nav-section { margin-bottom: 6px; }
+        .sidebar-nav .nav-section-title {
+            font-size: 0.68rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-tertiary);
+            padding: 10px 8px 6px;
+            cursor: default;
+            user-select: none;
+        }
+        .sidebar-nav a {
+            display: block;
+            padding: 7px 10px;
+            font-size: 0.825rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            transition: all var(--transition);
+            font-weight: 450;
+            letter-spacing: -0.005em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .sidebar-nav a:hover { background: #f3f4f6; color: var(--text); }
+        .sidebar-nav a.active { background: var(--accent-light); color: var(--accent); font-weight: 550; }
+        .badge-method {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 4px;
+            letter-spacing: 0.04em;
+            vertical-align: middle;
+            color: #fff;
+            background: #6b7280;
+        }
+        .badge-post { background: #f59e0b; }
+        .badge-callback { background: #6d28d9; }
+
+        /* Main */
+        .main {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            max-width: 960px;
+            padding: 32px 40px 80px;
+            min-width: 0;
+        }
+        .main .page-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+        .main .page-subtitle {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            margin-bottom: 28px;
+            font-weight: 450;
+        }
+        .meta-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+        .chip {
+            font-size: 0.72rem;
+            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #f3f4f6;
+            color: var(--text-secondary);
+            letter-spacing: 0.01em;
+        }
+
+        /* Section Accordion */
+        .section {
+            margin-bottom: 32px;
+            scroll-margin-top: 80px;
+            border: none;
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            padding: 8px 0;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.2s;
+            user-select: none;
+        }
+        .section-header:hover { border-bottom: 2px solid var(--border-light); }
+        .section-header.active { border-bottom: 2px solid var(--accent); }
+        .section-header h2 {
+            font-size: 1.35rem;
+            font-weight: 650;
+            letter-spacing: -0.015em;
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            border: none;
+            flex: 1;
+        }
+        .section-header .toggle-icon {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.2s ease;
+            flex-shrink: 0;
+            color: var(--text-tertiary);
+        }
+        .section-header.active .toggle-icon { transform: rotate(90deg); }
+        .section-content {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.35s ease, padding 0.2s ease;
+            padding: 0;
+        }
+        .section-content.open {
+            max-height: 5000px;
+            padding: 12px 0 6px;
+        }
+
+        /* Paragraphs and labels */
+        .section-content p {
+            margin-bottom: 10px;
+            color: var(--text-secondary);
+            font-size: 0.89rem;
+            max-width: 80ch;
+        }
+        .endpoint-label {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            font-weight: 500;
+            background: #f9fafb;
+            border-radius: var(--radius-sm);
+            padding: 6px 13px;
+            margin: 4px 0 10px;
+            letter-spacing: -0.01em;
+            word-break: break-all;
+            border: none;
+        }
+        .endpoint-label .method {
+            font-weight: 700;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: #fff;
+            flex-shrink: 0;
+        }
+        .method-post { background: #f59e0b; }
+
+        /* Base URL notice */
+        .env-notice {
+            display: flex;
+            gap: 24px;
+            align-items: flex-start;
+            margin: 16px 0;
+            flex-wrap: wrap;
+        }
+        .env-card {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 18px;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+        }
+        .env-card .env-icon {
+            color: var(--accent);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+        }
+        .env-card code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            background: #f2f4f7;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--text);
+        }
+        .env-label { font-weight: 600; font-size: 0.85rem; }
+
+        /* Tables – no border, clean */
+        .table-wrap {
+            margin: 12px 0 18px;
+            overflow-x: auto;
+            border: none;
+            box-shadow: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.81rem;
+            min-width: 600px;
+            background: transparent;
+            border: none;
+        }
+        table thead th {
+            font-weight: 600;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--text-tertiary);
+            padding: 10px 14px 8px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-light);
+            background: transparent;
+            white-space: nowrap;
+        }
+        table tbody td {
+            padding: 10px 14px;
+            vertical-align: top;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            border-bottom: 1px solid #f4f5f7;
+        }
+        table tbody tr:last-child td { border-bottom: none; }
+        table tbody tr:hover { background: #fafbfc; }
+        .param-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 550;
+            color: var(--text);
+            font-size: 0.78rem;
+            white-space: nowrap;
+        }
+        .badge-required {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+            background: #fef2f2;
+            color: #dc2626;
+            letter-spacing: 0.04em;
+            margin-left: 4px;
+        }
+        .badge-optional {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            color: #6b7280;
+            letter-spacing: 0.04em;
+            margin-left: 4px;
+        }
+
+        /* Code blocks – no border, clean */
+        .code-block {
+            background: #1e1e2a;
+            border-radius: var(--radius);
+            margin: 10px 0 18px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: none;
+        }
+        .code-block .code-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 16px;
+            background: #262635;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            color: #a0a0b8;
+            text-transform: uppercase;
+            border-bottom: none;
+        }
+        .code-block pre {
+            margin: 0;
+            padding: 16px 18px;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.76rem;
+            line-height: 1.55;
+            background: #1e1e2a;
+            color: #d4d4d8;
+            letter-spacing: -0.005em;
+            max-height: 420px;
+            overflow-y: auto;
+            border: none;
+        }
+        .code-block pre code { font-family: inherit; background: none; padding: 0; color: #d4d4d8; }
+        .inline-code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.78rem;
+            background: #f1f3f5;
+            padding: 2px 7px;
+            border-radius: 4px;
+            color: var(--text);
+            letter-spacing: -0.005em;
+        }
+
+        /* Callouts */
+        .callout {
+            border-left: 3px solid var(--accent);
+            background: var(--accent-light);
+            padding: 12px 16px;
+            border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+            margin: 12px 0 18px;
+            font-size: 0.82rem;
+            color: var(--accent-dark);
+            font-weight: 450;
+        }
+        .callout strong { font-weight: 600; }
+        .callout.warning { border-left-color: var(--warning); background: var(--warning-light); color: #92400e; }
+
+        /* Response code grid */
+        .code-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin: 12px 0 18px;
+        }
+        .code-card {
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            padding: 10px 13px;
+            font-size: 0.76rem;
+            box-shadow: var(--shadow-sm);
+            border: none;
+        }
+        .code-card .ec { font-family: 'JetBrains Mono', monospace; font-weight: 650; font-size: 0.82rem; color: var(--text); }
+        .code-card .emsg { color: var(--text-tertiary); font-size: 0.7rem; margin-top: 2px; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .sidebar { transform: translateX(-100%); transition: transform var(--transition); }
+            .sidebar.open { transform: translateX(0); }
+            .main { margin-left: 0; padding: 20px 18px 60px; }
+            .main .page-title { font-size: 1.35rem; }
+            .code-grid { grid-template-columns: 1fr; }
+            .mobile-menu-btn { display: flex !important; }
+        }
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 12px;
+            left: 12px;
+            z-index: 200;
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            padding: 8px 12px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-md);
+            align-items: center;
+            gap: 6px;
+            border: none;
+        }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 99; }
+        .overlay.show { display: block; }
+        @media (min-width: 901px) { .mobile-menu-btn { display: none !important; } }
+
+        /* Hidden sections (registration) */
+        .hidden-section { display: none; }
+        .sidebar-nav a.hidden-link { display: none; }
+
+        @media print {
+            .sidebar, .mobile-menu-btn, .overlay { display: none !important; }
+            .main { margin-left: 0; padding: 0; max-width: 100%; }
+            body { font-size: 11px; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle menu">
+        <!-- menu icon -->
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="1.5" rx="0.75"/><rect x="3" y="11" width="18" height="1.5" rx="0.75"/><rect x="3" y="17" width="18" height="1.5" rx="0.75"/></svg>
+        Menu
+    </button>
+    <div class="overlay" id="overlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo"><span class="dot"></span> MoMoney Wallet</div>
+            <div class="version">Integration Guide v1.0.4</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Overview</div>
+                <a href="#overview">Introduction</a>
+                <a href="#diagram">Customer Journey</a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Authentication</div>
+                <a href="#get-access-token">1.1 Get Access Token <span class="badge-method badge-post">POST</span></a>
+                <a href="#get-user-token">1.2 Get User Token <span class="badge-method badge-post">POST</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Payment APIs</div>
+                <a href="#request-qr-payment">2. Request QR Payment <span class="badge-method badge-post">POST</span></a>
+                <a href="#request-push-payment">4. Request Push Payment <span class="badge-method badge-post">POST</span></a>
+                <a href="#request-hosted-form">9. Request Hosted Form <span class="badge-method badge-post">POST</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Enquiry</div>
+                <a href="#enquiry-subscriber-qr">3. Enquiry Subscriber QR <span class="badge-method badge-post">POST</span></a>
+                <a href="#enquiry-transaction">7. Enquiry Transaction <span class="badge-method badge-post">POST</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Transaction</div>
+                <a href="#confirm-transaction">8. Confirm Transaction <span class="badge-method badge-post">POST</span></a>
+                <a href="#refund-payment">6. Refund Payment <span class="badge-method badge-post">POST</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Callback</div>
+                <a href="#return-payment-result">5. Return Payment Result <span class="badge-method badge-callback">CALLBACK</span></a>
+            </div>
+            <div class="nav-section">
+                <div class="nav-section-title">Reference</div>
+                <a href="#response-codes">10. Response Code List</a>
+            </div>
+            <!-- Registration links hidden -->
+            <a href="#register-account" class="hidden-link">III. Register Application</a>
+            <a href="#production-env" class="hidden-link">IV. Production Environment</a>
+        </nav>
+    </aside>
+
+    <main class="main" id="mainContent">
+        <h1 class="page-title">Online Merchant Integration Guide</h1>
+        <p class="page-subtitle">MoMoney Wallet System API Specification for third‑party Online Merchants</p>
+        <div class="meta-row">
+            <span class="chip">📄 v1.0.4</span>
+            <span class="chip">📅 Feb 2023</span>
+            <span class="chip">🔐 OAuth 2.0</span>
+            <span class="chip">🌐 REST API</span>
+        </div>
+
+        <!-- Overview section collapsible -->
+        <section class="section" id="overview">
+            <div class="section-header active">
+                <h2>Introduction</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content open">
+                <p>This document defines the process for a <strong>3rd party Online Merchant</strong> to connect to the MoMoney Wallet System. It covers the complete integration lifecycle — from authentication through payment initiation, enquiry, confirmation, refund, and callback handling.</p>
+                <div class="env-notice">
+                    <div class="env-card">
+                        <span class="env-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M9 3h6v4H9z"/><path d="M15 3v4h4l-4-4z"/><path d="M14 9h-4v4h4zM10 13h4v4h-4z"/></svg></span>
+                        <div><span class="env-label">Sandbox</span><br><code>https://test-openapi.momoney.com.mm</code></div>
+                    </div>
+                    <div class="env-card">
+                        <span class="env-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2s-5 4-5 10a5 5 0 0 0 10 0c0-6-5-10-5-10z"/><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0"/></svg></span>
+                        <div><span class="env-label">Production</span><br><code>https://openapi.momoney.com.mm</code></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Customer Journey -->
+        <section class="section" id="diagram">
+            <div class="section-header">
+                <h2>Customer Journey</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>The customer journey follows a sequential flow: the customer initiates a payment → the merchant requests a QR or push payment → the subscriber authorizes the payment in the wallet app → the Wallet System processes the transaction → a callback is sent to the merchant with the payment result.</p>
+                <p><strong>General flow:</strong> Authentication → Payment initiation (QR/Push) → Subscriber payment → Wallet callback → (Optional) Refund</p>
+            </div>
+        </section>
+
+        <!-- 1.1 Get Access Token -->
+        <section class="section" id="get-access-token">
+            <div class="section-header">
+                <h2>1.1 Get Access Token</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>This endpoint uses the OAuth 2.0 <code class="inline-code">client_credentials</code> grant to obtain an access token. You will need this token to call all subsequent APIs. The token has a limited lifetime (3600 seconds by default).</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /oauth2/token</div>
+                <h4>Request Header</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">Content-Type</td><td>application/json</td></tr>
+                            <tr><td class="param-name">Authorization</td><td>Basic {Base64(consumer_key:consumer_secret)}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Request Body</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Parameter</th><th>Type</th><th>Mandatory</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">grant_type</td><td>String</td><td><span class="badge-required">Required</span></td><td>Fixed value: <code class="inline-code">client_credentials</code></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Response Parameters</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">access_token</td><td>String</td><td>Token to access the Wallet System</td></tr>
+                            <tr><td class="param-name">scope</td><td>String</td><td>am_application_scope default</td></tr>
+                            <tr><td class="param-name">token_type</td><td>String</td><td>Bearer</td></tr>
+                            <tr><td class="param-name">expires_in</td><td>String</td><td>Expiry time in seconds (e.g., 3600)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p><strong>Sandbox credentials:</strong></p>
+                <div class="callout">
+                    consumer_key: <code class="inline-code">hCcqw44o4oeFtx40XEp7D58pS74a</code><br>
+                    consumer_secret: <code class="inline-code">TFH1UKf5ADZ6CQUFaJCuICmM1KYa</code>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Sample Request</div>
+                    <pre><code>POST /token HTTP/1.1
+Host: https://test-openapi.momoney.com.mm
+Authorization: Basic {Base64(consumer_key:consumer_secret)}
+Content-Type: application/json
+
+{"grant_type": "client_credentials"}</code></pre>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Sample Response (200)</div>
+                    <pre><code>{
+  "access_token": "eyJ4NXQiOiJNe...",
+  "scope": "am_application_scope default",
+  "token_type": "Bearer",
+  "expires_in": 3600
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1.2 Get User Token -->
+        <section class="section" id="get-user-token">
+            <div class="section-header">
+                <h2>1.2 Get User Token</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>After obtaining an access token, use this endpoint to log in as a merchant and get a user‑scoped token. This token identifies your merchant session and is required for all payment‑related operations.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/login</div>
+                <h4>Request Header</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">Content-Type</td><td>application/json</td></tr>
+                            <tr><td class="param-name">Token</td><td>Bearer {Access_token}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Request Body</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Parameter</th><th>Type</th><th>Mandatory</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">phone</td><td>String</td><td><span class="badge-required">Required</span></td><td>Merchant phone number</td></tr>
+                            <tr><td class="param-name">password</td><td>String</td><td><span class="badge-required">Required</span></td><td>Merchant password</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Response Parameters</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">err</td><td>String</td><td>Error code; 200 = success</td></tr>
+                            <tr><td class="param-name">message</td><td>String</td><td>Description (e.g., "Success")</td></tr>
+                            <tr><td class="param-name">token.token</td><td>String</td><td>User token (UUID)</td></tr>
+                            <tr><td class="param-name">token.expiredAt</td><td>String</td><td>Expiry time (ISO 8601)</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Sample Request</div>
+                    <pre><code>POST /partner/merchant/login
+Host: test-openapi.momoney.com.mm
+Content-Type: application/json
+Token: Bearer {access_token}
+
+{"phone":"0950000004","password":"841539"}</code></pre>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Sample Response</div>
+                    <pre><code>{
+  "err": 200,
+  "message": "Success",
+  "token": {
+    "token": "5e2f768a-5228-49ca-b228-3fc1eaa27373",
+    "expiredAt": "2021-08-06T01:35:40.545Z"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Request QR Payment -->
+        <section class="section" id="request-qr-payment">
+            <div class="section-header">
+                <h2>2. Request QR Payment</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>Generate a QR code that the subscriber scans with their wallet app to complete the payment. The response includes both a raw QR string and a Base64‑encoded PNG image, as well as a deep link for in‑app payments.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/getQRPayment</div>
+                <h4>Request Headers</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">Content-Type</td><td>application/json</td></tr>
+                            <tr><td class="param-name">Accept-Language</td><td>en (English) or my (Myanmar)</td></tr>
+                            <tr><td class="param-name">Authorization</td><td>Bearer {User_token}</td></tr>
+                            <tr><td class="param-name">Token</td><td>Bearer {Access_token}</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Request Body</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Parameter</th><th>Type</th><th>Mandatory</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">amount</td><td>Number</td><td><span class="badge-required">Required</span></td><td>Transaction amount</td></tr>
+                            <tr><td class="param-name">externalTransactionId</td><td>String</td><td><span class="badge-required">Required</span></td><td>Unique merchant transaction ID</td></tr>
+                            <tr><td class="param-name">externalAdditionalData</td><td>String</td><td><span class="badge-optional">Optional</span></td><td>Additional bill details</td></tr>
+                            <tr><td class="param-name">currency</td><td>String</td><td><span class="badge-required">Required</span></td><td>MMK or USD</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Response (key fields)</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">data.qrdata</td><td>String</td><td>Raw QR code string</td></tr>
+                            <tr><td class="param-name">data.qrBase64</td><td>Base64</td><td>Base64‑encoded PNG image</td></tr>
+                            <tr><td class="param-name">data.deeplink</td><td>String</td><td>Deep link for subscriber app</td></tr>
+                            <tr><td class="param-name">data.referenceNumber</td><td>String</td><td>Wallet‑generated reference</td></tr>
+                            <tr><td class="param-name">data.fees.debitFee</td><td>Number</td><td>Fee charged to customer</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Enquiry Subscriber QR -->
+        <section class="section" id="enquiry-subscriber-qr">
+            <div class="section-header">
+                <h2>3. Enquiry Subscriber QR Code</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>Resolve a subscriber’s static QR code to retrieve their registered phone number and name. This is useful before creating a payment request.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/enquirySubQR</div>
+                <h4>Request Body</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Parameter</th><th>Type</th><th>Mandatory</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">qrcode</td><td>String</td><td><span class="badge-required">Required</span></td><td>QR code scanned from subscriber</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Response</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">data.name</td><td>String</td><td>Subscriber name</td></tr>
+                            <tr><td class="param-name">data.phone</td><td>String</td><td>Subscriber phone number</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Sample Response</div>
+                    <pre><code>{
+  "err": 200,
+  "message": "Success",
+  "data": {
+    "name": "WIN THAN",
+    "phone": "09506969666"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Request Push Payment -->
+        <section class="section" id="request-push-payment">
+            <div class="section-header">
+                <h2>4. Request Push Payment</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>Send a push notification directly to a subscriber’s wallet app, prompting them to approve a payment. This requires the subscriber’s phone number.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/sendPushPayment</div>
+                <h4>Request Body</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Parameter</th><th>Type</th><th>Mandatory</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">amount</td><td>Number</td><td><span class="badge-required">Required</span></td><td>Transaction amount</td></tr>
+                            <tr><td class="param-name">externalTransactionId</td><td>String</td><td><span class="badge-required">Required</span></td><td>Unique merchant transaction ID</td></tr>
+                            <tr><td class="param-name">customerPhone</td><td>String</td><td><span class="badge-required">Required</span></td><td>Subscriber’s registered phone</td></tr>
+                            <tr><td class="param-name">currency</td><td>String</td><td><span class="badge-required">Required</span></td><td>MMK or USD</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Response</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">data.referenceNumber</td><td>String</td><td>Wallet‑generated reference</td></tr>
+                            <tr><td class="param-name">data.externalTransactionId</td><td>String</td><td>Merchant transaction ID</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. Return Payment Result -->
+        <section class="section" id="return-payment-result">
+            <div class="section-header">
+                <h2>5. Return Payment Result (Callback)</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>After the subscriber completes the payment, the Wallet System sends an encrypted result to your registered callback URL. The body contains two fields: <code class="inline-code">paymentResult</code> (AES‑encrypted JSON) and <code class="inline-code">checksum</code> (SHA‑256 of the raw JSON). You must decrypt the payload using the provided key.</p>
+                <div class="callout warning">
+                    <strong>Decryption key (sandbox):</strong> <code class="inline-code">QEOYZtmGazgtgA27iNy8X4TKrXOiFLsU</code><br>
+                    Algorithm: AES‑256, mode ECB, padding PKCS7.
+                </div>
+                <h4>Decrypted Result Object</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">amount</td><td>Number</td><td>Transaction amount</td></tr>
+                            <tr><td class="param-name">totalAmount</td><td>Number</td><td>Total including fees</td></tr>
+                            <tr><td class="param-name">currency</td><td>String</td><td>MMK</td></tr>
+                            <tr><td class="param-name">status</td><td>String</td><td>"done" or "failed"</td></tr>
+                            <tr><td class="param-name">referenceNumber</td><td>String</td><td>Wallet reference number</td></tr>
+                            <tr><td class="param-name">externalTransactionId</td><td>String</td><td>Merchant transaction ID</td></tr>
+                            <tr><td class="param-name">transRefId</td><td>String</td><td>Wallet system transaction ID</td></tr>
+                            <tr><td class="param-name">customer.name</td><td>String</td><td>Customer name</td></tr>
+                            <tr><td class="param-name">customer.phone</td><td>String</td><td>Customer phone</td></tr>
+                            <tr><td class="param-name">merchant.name</td><td>String</td><td>Merchant name</td></tr>
+                            <tr><td class="param-name">fees.debitFee</td><td>Number</td><td>Customer fee</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Refund Payment -->
+        <section class="section" id="refund-payment">
+            <div class="section-header">
+                <h2>6. Refund Payment</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>Initiate a refund for a previously completed transaction using the reference number obtained from the QR or push payment response.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/refundPayment</div>
+                <h4>Request Body</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Parameter</th><th>Type</th><th>Mandatory</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">referenceNumber</td><td>String</td><td><span class="badge-required">Required</span></td><td>Reference from QR/Push Payment</td></tr>
+                            <tr><td class="param-name">externalTransactionId</td><td>String</td><td><span class="badge-required">Required</span></td><td>Unique merchant transaction ID</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <h4>Response (key fields)</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">data.transType</td><td>"refund"</td></tr>
+                            <tr><td class="param-name">data.status</td><td>"done"</td></tr>
+                            <tr><td class="param-name">data.transRefId</td><td>Refund transaction ID</td></tr>
+                            <tr><td class="param-name">data.amount</td><td>Refunded amount</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. Enquiry API -->
+        <section class="section" id="enquiry-transaction">
+            <div class="section-header">
+                <h2>7. Enquiry Transaction API</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>This endpoint must be called <strong>before</strong> confirming a transaction. It verifies the transaction amount and other details to prevent mismatches. You need a device ID and shop ID.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/enquiryTransaction</div>
+                <div class="callout warning">Always call this API prior to <code class="inline-code">confirmTransaction</code>.</div>
+                <h4>Additional Headers</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Value</th></tr></thead>
+                        <tbody><tr><td class="param-name">DeviceId</td><td>Unique device identifier</td></tr></tbody>
+                    </table>
+                </div>
+                <h4>Request Body</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Parameter</th><th>Type</th><th>Mandatory</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">serviceCode</td><td>String</td><td><span class="badge-required">Required</span></td><td>Fixed: <code class="inline-code">QRCODEPAYMENT</code></td></tr>
+                            <tr><td class="param-name">amount</td><td>Number</td><td><span class="badge-required">Required</span></td><td>Transaction amount</td></tr>
+                            <tr><td class="param-name">currency</td><td>String</td><td><span class="badge-required">Required</span></td><td>MMK</td></tr>
+                            <tr><td class="param-name">qrcode</td><td>String</td><td><span class="badge-required">Required</span></td><td>Scanned QR code</td></tr>
+                            <tr><td class="param-name">deviceId</td><td>String</td><td><span class="badge-required">Required</span></td><td>Device ID</td></tr>
+                            <tr><td class="param-name">shopId</td><td>String</td><td><span class="badge-required">Required</span></td><td>Merchant shop ID</td></tr>
+                            <tr><td class="param-name">externalTransactionId</td><td>String</td><td><span class="badge-required">Required</span></td><td>Merchant transaction ID</td></tr>
+                            <tr><td class="param-name">beneficiaryPhone</td><td>String</td><td><span class="badge-optional">Optional</span></td><td>Consumer phone</td></tr>
+                            <tr><td class="param-name">beneficiaryName</td><td>String</td><td><span class="badge-optional">Optional</span></td><td>Consumer name</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. Confirm Transaction -->
+        <section class="section" id="confirm-transaction">
+            <div class="section-header">
+                <h2>8. Confirm Transaction API</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>Finalize a transaction after a successful enquiry. The request parameters are identical to the Enquiry API. The response includes the final transaction details with fees and discounts.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/confirmTransaction</div>
+                <div class="code-block">
+                    <div class="code-header">Sample Response</div>
+                    <pre><code>{
+  "err": 200,
+  "message": "Success",
+  "data": {
+    "referenceNumber": "5f2bce3932ac3d36099546fa",
+    "amount": 1250,
+    "totalAmount": 1250,
+    "fees": { "debitFee": 250, "creditFee": 350 },
+    "externalTransactionId": "HD100011"
+  }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. Request Hosted Form -->
+        <section class="section" id="request-hosted-form">
+            <div class="section-header">
+                <h2>9. Request Hosted Form</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>Request a hosted web payment form URL that can be opened in a mobile browser for the subscriber. Requires an HMAC‑SHA1 signature to ensure integrity.</p>
+                <div class="endpoint-label"><span class="method method-post">POST</span> /partner/merchant/requestHostedForm</div>
+                <h4>Signature Generation</h4>
+                <p>Sort parameters alphabetically, concatenate as <code class="inline-code">AMOUNT=1000&CURRENCY=MMK&EXTERNALTRANSID=...</code>, then compute HMAC‑SHA1 with your secret key.</p>
+                <div class="code-block">
+                    <div class="code-header">Example</div>
+                    <pre><code>// concatenatedString = AMOUNT=1000&CURRENCY=MMK&EXTERNALTRANSID=sdbfh74b74bdasdbh43vb238
+// SIGNATURE = 77D34189B76650CC790025593A68453EBFD19657</code></pre>
+                </div>
+                <h4>Response</h4>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Field</th><th>Description</th></tr></thead>
+                        <tbody>
+                            <tr><td class="param-name">data.webVariable</td><td>URL to hosted payment form</td></tr>
+                            <tr><td class="param-name">data.transaction.transRefId</td><td>Transaction reference ID</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. Response Code List -->
+        <section class="section" id="response-codes">
+            <div class="section-header">
+                <h2>10. Response Code List</h2>
+                <svg class="toggle-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+            </div>
+            <div class="section-content">
+                <p>All API responses include an <code class="inline-code">err</code> field. The table below lists all possible error codes.</p>
+                <div class="code-grid">
+                    <div class="code-card"><span class="ec">401</span><br><span class="emsg">Unauthorized — Check header token</span></div>
+                    <div class="code-card"><span class="ec">7000</span><br><span class="emsg">Internal Server Error</span></div>
+                    <div class="code-card"><span class="ec">7001</span><br><span class="emsg">Invalid Parameter — Missing params</span></div>
+                    <div class="code-card"><span class="ec">7004</span><br><span class="emsg">Not found data</span></div>
+                    <div class="code-card"><span class="ec">7005</span><br><span class="emsg">Forbidden</span></div>
+                    <div class="code-card"><span class="ec">7006</span><br><span class="emsg">Bad request — Check input params</span></div>
+                    <div class="code-card"><span class="ec">7008</span><br><span class="emsg">Wrong Message Type</span></div>
+                    <div class="code-card"><span class="ec">8002</span><br><span class="emsg">Wrong pin — Check password</span></div>
+                    <div class="code-card"><span class="ec">8027</span><br><span class="emsg">Invalid Login or password</span></div>
+                    <div class="code-card"><span class="ec">8031</span><br><span class="emsg">Account locked or inactive</span></div>
+                    <div class="code-card"><span class="ec">9051</span><br><span class="emsg">Sender is not a valid user</span></div>
+                    <div class="code-card"><span class="ec">9052</span><br><span class="emsg">Receiver is not a valid user</span></div>
+                    <div class="code-card"><span class="ec">9053</span><br><span class="emsg">Service not available for user</span></div>
+                    <div class="code-card"><span class="ec">9054</span><br><span class="emsg">Sender pocket locked</span></div>
+                    <div class="code-card"><span class="ec">9055</span><br><span class="emsg">Receiver pocket locked</span></div>
+                    <div class="code-card"><span class="ec">9056</span><br><span class="emsg">Sender balance checksum error</span></div>
+                    <div class="code-card"><span class="ec">9057</span><br><span class="emsg">Receiver balance checksum error</span></div>
+                    <div class="code-card"><span class="ec">9058</span><br><span class="emsg">Missing biller config</span></div>
+                    <div class="code-card"><span class="ec">9059</span><br><span class="emsg">Amount less than minimum</span></div>
+                    <div class="code-card"><span class="ec">9060</span><br><span class="emsg">Amount bigger than maximum</span></div>
+                    <div class="code-card"><span class="ec">9061</span><br><span class="emsg">Sender balance insufficient</span></div>
+                    <div class="code-card"><span class="ec">9062</span><br><span class="emsg">Receiver balance insufficient</span></div>
+                    <div class="code-card"><span class="ec">9063</span><br><span class="emsg">Amount exceeded daily limit</span></div>
+                    <div class="code-card"><span class="ec">9064</span><br><span class="emsg">Amount exceeded monthly limit</span></div>
+                    <div class="code-card"><span class="ec">9065</span><br><span class="emsg">Transaction too frequent</span></div>
+                    <div class="code-card"><span class="ec">9066</span><br><span class="emsg">Sender balance exceed limit</span></div>
+                    <div class="code-card"><span class="ec">9067</span><br><span class="emsg">Receiver balance exceed limit</span></div>
+                    <div class="code-card"><span class="ec">9102</span><br><span class="emsg">Transaction not found / cannot be reversed</span></div>
+                    <div class="code-card"><span class="ec">417</span><br><span class="emsg">External transaction ID duplicated</span></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration sections hidden -->
+        <section class="section hidden-section" id="register-account">
+            <div class="section-header"><h2>III. Register Application</h2></div>
+            <div class="section-content"><p>Content removed as per user request.</p></div>
+        </section>
+        <section class="section hidden-section" id="production-env">
+            <div class="section-header"><h2>IV. Production Environment</h2></div>
+            <div class="section-content"><p>Content removed as per user request.</p></div>
+        </section>
+
+        <footer style="border-top:1px solid var(--border-light);padding-top:20px;margin-top:40px;color:var(--text-tertiary);font-size:0.75rem;">
+            <p>MoMoney Wallet System — Online Merchant Integration Guide v1.0.4</p>
+        </footer>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Highlight.js
+            document.querySelectorAll('.code-block pre code').forEach(block => {
+                hljs.highlightElement(block);
+            });
+
+            // Collapsible sections
+            const sectionHeaders = document.querySelectorAll('.section-header');
+            sectionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    const section = this.closest('.section');
+                    const content = section.querySelector('.section-content');
+                    const isOpen = content.classList.contains('open');
+                    if (isOpen) {
+                        content.classList.remove('open');
+                        this.classList.remove('active');
+                    } else {
+                        content.classList.add('open');
+                        this.classList.add('active');
+                    }
+                });
+            });
+
+            // Mobile menu
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            function openSidebar() {
+                sidebar.classList.add('open');
+                overlay.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+            function closeSidebar() {
+                sidebar.classList.remove('open');
+                overlay.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+            mobileBtn.addEventListener('click', () => {
+                sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+            });
+            overlay.addEventListener('click', closeSidebar);
+            document.querySelectorAll('.sidebar-nav a').forEach(link => {
+                link.addEventListener('click', () => {
+                    if (window.innerWidth <= 900) closeSidebar();
+                });
+            });
+
+            // Active nav on scroll
+            const navLinks = document.querySelectorAll('.sidebar-nav a:not(.hidden-link)');
+            const sectionsMap = new Map();
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href && href.startsWith('#') && href.length > 1) {
+                    const el = document.getElementById(href.substring(1));
+                    if (el) sectionsMap.set(el, link);
+                }
+            });
+            function updateActiveLink() {
+                let currentId = '';
+                const scrollPos = window.scrollY + 120;
+                sectionsMap.forEach((link, el) => {
+                    if (el.offsetTop <= scrollPos) currentId = el.id;
+                });
+                navLinks.forEach(link => link.classList.remove('active'));
+                const activeLink = Array.from(sectionsMap.values()).find(link => link.getAttribute('href') === '#' + currentId);
+                if (activeLink) activeLink.classList.add('active');
+            }
+            window.addEventListener('scroll', updateActiveLink, { passive: true });
+            updateActiveLink();
+
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 900) closeSidebar();
+            });
+
+            // Open first section by default
+            const firstSection = document.querySelector('.section .section-content');
+            if (firstSection) firstSection.classList.add('open');
+        });
+    </script>
+</body>
+</html>
